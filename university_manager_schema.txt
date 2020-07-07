@@ -1,0 +1,167 @@
+USE university_manager_schema;
+
+INSERT INTO students(students_name)
+VALUES ("Krista");
+
+INSERT INTO students(students_name)
+VALUES ("Zachary");
+
+INSERT INTO students(students_name)
+VALUES ("Chad");
+
+INSERT INTO students(students_name)
+VALUES ("Dodson");
+
+INSERT INTO students(students_name)
+VALUES ("Zoey");
+
+INSERT INTO students(students_name)
+VALUES ("Yoda");
+
+BEGIN;
+DELETE FROM students
+WHERE students_id = 4;
+
+DELETE FROM students
+WHERE students_id = 5;
+
+DELETE FROM students
+WHERE students_id = 6;
+
+ROLLBACK;
+
+INSERT INTO professors(professors_name)
+VALUES ("Mrs. Katie");
+
+INSERT INTO professors(professors_name)
+VALUES ("Mr. Johnson");
+
+INSERT INTO professors(professors_name)
+VALUES ("Dr. Leroy");
+
+INSERT INTO courses(courses_name, courses_professors_id)
+VALUES ("Math", 1);
+
+INSERT INTO courses(courses_name, courses_professors_id)
+VALUES ("English", 2);
+
+INSERT INTO courses(courses_name, courses_professors_id)
+VALUES ("Science", 3);
+
+INSERT INTO courses(courses_name, courses_professors_id)
+VALUES ("Business", 3);
+
+INSERT INTO grades(grades_score, grades_students_id, grades_courses_id)
+VALUES (75, 1, 7);
+
+INSERT INTO grades(grades_score, grades_students_id, grades_courses_id)
+VALUES (97, 1, 1);
+
+INSERT INTO grades(grades_score, grades_students_id, grades_courses_id)
+VALUES (79, 2, 5);
+
+INSERT INTO grades(grades_score, grades_students_id, grades_courses_id)
+VALUES (86, 3, 5);
+
+INSERT INTO grades(grades_score, grades_students_id, grades_courses_id)
+VALUES (99, 7, 1);
+
+INSERT INTO grades(grades_score, grades_students_id, grades_courses_id)
+VALUES (90, 8, 5);
+
+INSERT INTO grades(grades_score, grades_students_id, grades_courses_id)
+VALUES (89, 9, 6);
+
+#deleted
+#INSERT INTO grades(grades_score, grades_students_id, grades_courses_id)
+#VALUES (76, 3, 5);
+
+INSERT INTO grades(grades_score, grades_students_id, grades_courses_id)
+VALUES (66, 3, 1);
+
+INSERT INTO grades(grades_score, grades_students_id, grades_courses_id)
+VALUES (96, 3, 6);
+
+INSERT INTO grades(grades_score, grades_students_id, grades_courses_id)
+VALUES (92, 1, 5);
+
+INSERT INTO grades(grades_score, grades_students_id, grades_courses_id)
+VALUES (92, 1, 6);
+
+INSERT INTO grades(grades_score, grades_students_id, grades_courses_id)
+VALUES (77, 2, 1);
+
+INSERT INTO grades(grades_score, grades_students_id, grades_courses_id)
+VALUES (98, 2, 6);
+
+INSERT INTO grades(grades_score, grades_students_id, grades_courses_id)
+VALUES (70, 7, 5);
+
+INSERT INTO grades(grades_score, grades_students_id, grades_courses_id)
+VALUES (59, 7, 6);
+
+INSERT INTO grades(grades_score, grades_students_id, grades_courses_id)
+VALUES (96, 8, 1);
+
+INSERT INTO grades(grades_score, grades_students_id, grades_courses_id)
+VALUES (99, 8, 6);
+
+INSERT INTO grades(grades_score, grades_students_id, grades_courses_id)
+VALUES (86, 9, 1);
+
+INSERT INTO grades(grades_score, grades_students_id, grades_courses_id)
+VALUES (88, 9, 5);
+
+BEGIN;
+DELETE FROM grades
+WHERE grades_id = 12;
+
+ROLLBACK;
+
+#The average grade that is given by each professor
+SELECT 'Professor:', professors_name AS "Professor", 'Average Grade:', AVG(grades_score) AS "Average Grade"
+FROM grades g
+JOIN courses c
+ON c.courses_id = g.grades_courses_id
+JOIN professors p
+ON p.professors_id = c.courses_professors_id
+GROUP BY professors_id;
+
+#The top grades for each student
+SELECT 'Student:', students_name AS "Student", 'Top Grade:', MAX(grades_score) AS "Top Grade"
+FROM grades g
+JOIN students s
+ON s.students_id = g.grades_students_id
+GROUP BY students_name;
+
+#Group students by the courses that they are enrolled in
+SELECT "Course:", courses_name AS "Course" , "Student:", students_name AS "Student"
+FROM grades g
+JOIN students s
+ON s.students_id = g.grades_students_id
+JOIN courses c
+ON c.courses_id = g.grades_courses_id
+ORDER BY courses_name;
+
+#Create a summary report of courses and their average grades, sorted by the most challenging 
+#course (course with the lowest average grade) to the easiest course
+SELECT courses_name AS "Course" , AVG(grades_score) AS "Average Score"
+FROM grades g
+JOIN courses c
+ON c.courses_id = g.grades_courses_id
+GROUP BY courses_name
+ORDER BY AVG(grades_score) ASC;
+
+#Finding which student and professor have the most courses in common
+SELECT students_name AS 'Student', professors_name AS 'Professor',
+COUNT(*) AS courses_in_common
+FROM grades g
+JOIN students s
+ON s.students_id = g.grades_students_id
+JOIN courses c
+ON c.courses_id = g.grades_courses_id
+JOIN professors p
+ON p.professors_id = c.courses_professors_id
+GROUP BY students_name, professors_name
+ORDER BY courses_in_common DESC
+LIMIT 1;
